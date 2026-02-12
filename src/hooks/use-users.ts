@@ -1,6 +1,22 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '@/lib/api';
-import type { User, Pagination } from '@/types';
+import type { User, Pagination, GrowthData } from '@/types';
+
+export interface UsersAnalytics {
+  signupGrowth: GrowthData[];
+  roleDistribution: { _id: string; count: number }[];
+  statusDistribution: { _id: string; count: number }[];
+}
+
+export function useUsersAnalytics(period: '7d' | '30d' | '90d' = '30d') {
+  return useQuery({
+    queryKey: ['users-analytics', period],
+    queryFn: async () => {
+      const res = await api.get('/users/analytics', { params: { period } });
+      return res.data as UsersAnalytics;
+    },
+  });
+}
 
 interface UsersParams {
   page?: number;
