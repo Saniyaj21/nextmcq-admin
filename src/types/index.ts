@@ -178,3 +178,134 @@ export interface GrowthData {
   _id: string;
   count: number;
 }
+
+// ==========================================
+// APP CONFIG / SETTINGS
+// ==========================================
+export interface AppConfig {
+  _id: string;
+  key: string;
+  value: unknown;
+  description: string;
+  category: 'rewards' | 'limits' | 'system' | 'app';
+  updatedBy?: Pick<User, '_id' | 'name' | 'email'> | string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ==========================================
+// NOTIFICATIONS
+// ==========================================
+export interface Notification {
+  _id: string;
+  title: string;
+  message: string;
+  type: 'announcement' | 'update' | 'promotion' | 'maintenance' | 'reward';
+  targetAudience: 'all' | 'students' | 'teachers' | 'specific';
+  targetUsers: (Pick<User, '_id' | 'name' | 'email'> | string)[];
+  status: 'draft' | 'sent';
+  sentAt?: string;
+  sentBy?: Pick<User, '_id' | 'name' | 'email'> | string;
+  readCount?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ==========================================
+// CONTENT MODERATION / REPORTS
+// ==========================================
+export interface Report {
+  _id: string;
+  reportedBy: Pick<User, '_id' | 'name' | 'email'> | string;
+  contentType: 'test' | 'question' | 'post' | 'user';
+  contentId: string;
+  reason: 'inappropriate' | 'spam' | 'copyright' | 'incorrect' | 'offensive' | 'other';
+  description?: string;
+  status: 'pending' | 'reviewing' | 'resolved' | 'dismissed';
+  resolution?: {
+    action: 'none' | 'warned' | 'content_removed' | 'user_banned';
+    note?: string;
+    resolvedBy?: Pick<User, '_id' | 'name' | 'email'> | string;
+    resolvedAt?: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ==========================================
+// AUDIT LOG
+// ==========================================
+export interface AuditLog {
+  _id: string;
+  adminId: Pick<User, '_id' | 'name' | 'email'> | string;
+  action: string;
+  resource: string;
+  resourceId?: string;
+  details?: Record<string, unknown>;
+  ipAddress?: string;
+  userAgent?: string;
+  createdAt: string;
+}
+
+// ==========================================
+// LEADERBOARD
+// ==========================================
+export interface LeaderboardEntry {
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
+  profileImage?: { url: string | null; publicId: string | null };
+  rewards: { coins: number; xp: number; level: number };
+  student?: { totalTests: number; correctAnswers: number; totalQuestions: number };
+  teacher?: { testsCreated: number; totalAttemptsOfStudents: number };
+  rankingScore: number;
+}
+
+// ==========================================
+// REFERRAL
+// ==========================================
+export interface ReferralStats {
+  totalReferrers: number;
+  totalReferred: number;
+  topReferrers: { _id: string; count: number; name: string; email: string }[];
+}
+
+export interface ReferralEntry {
+  _id: string;
+  name: string;
+  email: string;
+  role: string;
+  createdAt: string;
+  referredBy: Pick<User, '_id' | 'name' | 'email' | 'referralCode'> & { referralCode?: string };
+}
+
+// ==========================================
+// RATINGS
+// ==========================================
+export interface RatingEntry {
+  _id: string;
+  testId: Pick<Test, '_id' | 'title' | 'subject'> | string;
+  userId: Pick<User, '_id' | 'name' | 'email'> | string;
+  rating: number;
+  createdAt: string;
+}
+
+export interface RatingStats {
+  averageRating: number;
+  totalRatings: number;
+  distribution: { _id: number; count: number }[];
+  lowestRated: { _id: string; title: string; subject: string; averageRating: number; totalRatings: number }[];
+}
+
+// ==========================================
+// ATTEMPTS ANALYTICS
+// ==========================================
+export interface AttemptsAnalytics {
+  passRate: number;
+  avgScore: number;
+  avgTime: number;
+  totalCompleted: number;
+  scoreDistribution: { _id: string; count: number }[];
+  completionsOverTime: GrowthData[];
+}

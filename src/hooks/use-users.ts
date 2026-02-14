@@ -85,3 +85,32 @@ export function useChangeUserRole() {
     },
   });
 }
+
+export function useUserAttempts(userId: string, page = 1) {
+  return useQuery({
+    queryKey: ['user-attempts', userId, page],
+    queryFn: async () => {
+      const res = await api.get(`/users/${userId}/attempts`, { params: { page } });
+      return res.data as {
+        attempts: import('@/types').TestAttempt[];
+        pagination: import('@/types').Pagination;
+      };
+    },
+    enabled: !!userId,
+  });
+}
+
+export function useUserReferrals(userId: string) {
+  return useQuery({
+    queryKey: ['user-referrals', userId],
+    queryFn: async () => {
+      const res = await api.get(`/users/${userId}/referrals`);
+      return res.data as {
+        referralCode: string | null;
+        referredBy: { _id: string; name: string; email: string; referralCode?: string } | null;
+        referredUsers: { _id: string; name: string; email: string; role: string; createdAt: string }[];
+      };
+    },
+    enabled: !!userId,
+  });
+}

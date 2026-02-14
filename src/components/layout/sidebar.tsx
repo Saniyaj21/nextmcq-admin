@@ -13,6 +13,14 @@ import {
   Image,
   Trophy,
   Newspaper,
+  ClipboardList,
+  FolderKanban,
+  Medal,
+  UserPlus,
+  Star,
+  Download,
+  ScrollText,
+  Settings,
 } from 'lucide-react';
 
 const navItems = [
@@ -25,6 +33,14 @@ const navItems = [
   { href: '/dashboard/banners', label: 'Banners', icon: Image },
   { href: '/dashboard/monthly-rewards', label: 'Monthly Rewards', icon: Trophy },
   { href: '/dashboard/posts', label: 'Posts', icon: Newspaper },
+  { href: '/dashboard/attempts', label: 'Attempts', icon: ClipboardList },
+  { href: '/dashboard/batches', label: 'Batches', icon: FolderKanban },
+  { href: '/dashboard/leaderboard', label: 'Leaderboard', icon: Medal },
+  { href: '/dashboard/referrals', label: 'Referrals', icon: UserPlus },
+  { href: '/dashboard/ratings', label: 'Ratings', icon: Star },
+  { href: '/dashboard/reports', label: 'Reports', icon: Download },
+  { href: '/dashboard/audit-logs', label: 'Audit Logs', icon: ScrollText },
+  { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ];
 
 export function Sidebar() {
