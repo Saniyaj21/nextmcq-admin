@@ -72,7 +72,7 @@ export default function AttemptDetailPage({ params }: { params: Promise<{ attemp
       </div>
 
       {/* Question-by-question review */}
-      {(attempt as Record<string, unknown>).answers && (
+      {Array.isArray((attempt as Record<string, unknown>).answers) && (
         <Card>
           <CardHeader><CardTitle>Answer Review</CardTitle></CardHeader>
           <CardContent className="space-y-4">
