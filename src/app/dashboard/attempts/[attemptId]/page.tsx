@@ -25,8 +25,8 @@ export default function AttemptDetailPage({ params }: { params: Promise<{ attemp
 
   if (!attempt) return <p>Attempt not found</p>;
 
-  const user = attempt.userId as unknown as Record<string, string>;
-  const test = attempt.testId as unknown as Record<string, string>;
+  const user = typeof attempt.userId === 'object' ? attempt.userId : null;
+  const test = typeof attempt.testId === 'object' ? attempt.testId : null;
 
   return (
     <div className="space-y-6">
@@ -45,11 +45,11 @@ export default function AttemptDetailPage({ params }: { params: Promise<{ attemp
           <CardContent className="space-y-3 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">User</span>
-              <span>{typeof user === 'object' ? user.name || user.email : '-'}</span>
+              <span>{user ? user.name || user.email : '-'}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Test</span>
-              <span>{typeof test === 'object' ? test.title : '-'}</span>
+              <span>{test ? test.title : '-'}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Score</span>
@@ -72,17 +72,17 @@ export default function AttemptDetailPage({ params }: { params: Promise<{ attemp
       </div>
 
       {/* Question-by-question review */}
-      {Array.isArray((attempt as Record<string, unknown>).answers) && (
+      {attempt.answers && attempt.answers.length > 0 && (
         <Card>
           <CardHeader><CardTitle>Answer Review</CardTitle></CardHeader>
           <CardContent className="space-y-4">
-            {((attempt as Record<string, unknown>).answers as Array<Record<string, unknown>>).map((answer, idx) => {
-              const q = answer.questionId as Record<string, unknown> | null;
-              if (!q || typeof q !== 'object') return null;
-              const isCorrect = answer.isCorrect as boolean;
-              const selected = answer.selectedAnswer as number;
-              const correct = q.correctAnswer as number;
-              const options = q.options as string[];
+            {attempt.answers.map((answer, idx) => {
+              const q = answer.questionId;
+              if (!q) return null;
+              const isCorrect = answer.isCorrect;
+              const selected = answer.selectedAnswer;
+              const correct = q.correctAnswer;
+              const options = q.options;
 
               return (
                 <div key={idx} className="border rounded-lg p-4">
@@ -92,7 +92,7 @@ export default function AttemptDetailPage({ params }: { params: Promise<{ attemp
                     ) : (
                       <XCircle className="h-5 w-5 text-red-600 mt-0.5 shrink-0" />
                     )}
-                    <p className="font-medium">Q{idx + 1}: {q.question as string}</p>
+                    <p className="font-medium">Q{idx + 1}: {q.question}</p>
                   </div>
                   <div className="space-y-1 ml-7">
                     {options?.map((opt, oi) => (

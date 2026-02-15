@@ -72,11 +72,11 @@ export default function BatchesPage() {
 
       <ConfirmDialog
         open={!!deleteId}
-        onClose={() => setDeleteId(null)}
+        onOpenChange={() => setDeleteId(null)}
         onConfirm={handleDelete}
         title="Delete Batch"
         description="Are you sure you want to delete this batch? This action cannot be undone."
-        isLoading={deleteBatch.isPending}
+        loading={deleteBatch.isPending}
       />
     </div>
   );

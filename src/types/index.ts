@@ -81,14 +81,25 @@ export interface Question {
   createdAt: string;
 }
 
+export interface AttemptAnswer {
+  questionId: {
+    question: string;
+    options: string[];
+    correctAnswer: number;
+  } | null;
+  selectedAnswer: number;
+  isCorrect: boolean;
+}
+
 export interface TestAttempt {
   _id: string;
-  userId: string;
-  testId: string;
+  userId: string | { _id: string; name: string; email: string };
+  testId: string | { _id: string; title: string };
   status: 'in_progress' | 'completed' | 'abandoned' | 'timed_out';
   score: { correct: number; total: number; percentage: number };
   timeSpent: number;
   rewards: { coins: number; xp: number };
+  answers?: AttemptAnswer[];
   createdAt: string;
 }
 
