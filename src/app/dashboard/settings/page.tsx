@@ -5,7 +5,6 @@ import { useSettings, useUpdateSetting } from '@/hooks/use-settings';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
@@ -54,55 +53,67 @@ export default function SettingsPage() {
     grouped[cat].push(s);
   }
 
+  // Only show tabs that have settings
+  const availableCategories = Object.keys(grouped);
+
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Settings</h1>
+    <div className="space-y-4">
+      <h1 className="text-2xl font-bold">Settings</h1>
 
       <Tabs value={category || 'all'} onValueChange={(v) => setCategory(v === 'all' ? '' : v)}>
         <TabsList>
           <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="rewards">Rewards</TabsTrigger>
-          <TabsTrigger value="limits">Limits</TabsTrigger>
-          <TabsTrigger value="system">System</TabsTrigger>
-          <TabsTrigger value="app">App</TabsTrigger>
+          {availableCategories.map((cat) => (
+            <TabsTrigger key={cat} value={cat} className="capitalize">{cat}</TabsTrigger>
+          ))}
         </TabsList>
       </Tabs>
 
       {(settings?.length === 0) && (
         <Card>
           <CardContent className="py-8 text-center text-muted-foreground">
-            No settings found. Settings are created when you update a value.
+            No settings found. Run the seed script to populate defaults.
           </CardContent>
         </Card>
       )}
 
       {Object.entries(grouped).map(([cat, items]) => (
         <Card key={cat}>
-          <CardHeader>
-            <CardTitle className="capitalize">{cat}</CardTitle>
+          <CardHeader className="py-3 px-4">
+            <CardTitle className="capitalize text-base">{cat}</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {items.map((setting) => (
-              <div key={setting.key} className="flex items-end gap-4">
-                <div className="flex-1">
-                  <Label>{setting.key}</Label>
-                  {setting.description && (
-                    <p className="text-xs text-muted-foreground mb-1">{setting.description}</p>
-                  )}
-                  <Input
-                    value={editValues[setting.key] ?? (typeof setting.value === 'object' ? JSON.stringify(setting.value) : String(setting.value ?? ''))}
-                    onChange={(e) => setEditValues({ ...editValues, [setting.key]: e.target.value })}
-                  />
-                </div>
-                <Button
-                  size="sm"
-                  onClick={() => handleSave(setting)}
-                  disabled={editValues[setting.key] === undefined || updateSetting.isPending}
-                >
-                  Save
-                </Button>
-              </div>
-            ))}
+          <CardContent className="px-4 pb-3 pt-0">
+            <div className="divide-y">
+              {items.map((setting) => {
+                const displayValue = editValues[setting.key] ?? (typeof setting.value === 'object' ? JSON.stringify(setting.value) : String(setting.value ?? ''));
+                const isNumeric = typeof setting.value === 'number';
+                const isDirty = editValues[setting.key] !== undefined;
+                return (
+                  <div key={setting.key} className="flex items-center gap-3 py-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium leading-tight">{setting.key}</p>
+                      {setting.description && (
+                        <p className="text-xs text-muted-foreground leading-tight">{setting.description}</p>
+                      )}
+                    </div>
+                    <Input
+                      className={isNumeric ? 'w-24 h-8 text-sm' : 'w-48 h-8 text-sm'}
+                      value={displayValue}
+                      onChange={(e) => setEditValues({ ...editValues, [setting.key]: e.target.value })}
+                    />
+                    <Button
+                      size="sm"
+                      variant={isDirty ? 'default' : 'outline'}
+                      className="h-8 px-3 text-xs"
+                      onClick={() => handleSave(setting)}
+                      disabled={!isDirty || updateSetting.isPending}
+                    >
+                      Save
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
           </CardContent>
         </Card>
       ))}
