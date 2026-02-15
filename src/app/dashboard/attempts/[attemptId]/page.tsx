@@ -25,8 +25,8 @@ export default function AttemptDetailPage({ params }: { params: Promise<{ attemp
 
   if (!attempt) return <p>Attempt not found</p>;
 
-  const user = attempt.userId as Record<string, string>;
-  const test = attempt.testId as Record<string, string>;
+  const user = attempt.userId as unknown as Record<string, string>;
+  const test = attempt.testId as unknown as Record<string, string>;
 
   return (
     <div className="space-y-6">
