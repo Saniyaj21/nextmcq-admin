@@ -3,15 +3,18 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTests, useDeleteTest, useTestsAnalytics } from '@/hooks/use-tests';
+import { useExportBulkTests, useExportTest } from '@/hooks/use-test-import-export';
+import { generateTemplateXLSX } from '@/lib/xlsx-utils';
 import { DataTable, type Column } from '@/components/data-table';
 import { SearchInput } from '@/components/search-input';
+import { TestImportDialog } from '@/components/test-import-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { toast } from 'sonner';
 import type { Test } from '@/types';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Upload, Download, FileDown } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, PieChart, Pie, Cell, Legend,
@@ -26,10 +29,14 @@ export default function TestsPage() {
   const [search, setSearch] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [period, setPeriod] = useState<'7d' | '30d' | '90d'>('30d');
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
+  const [selectedTestIds, setSelectedTestIds] = useState<Set<string>>(new Set());
 
   const { data, isLoading } = useTests({ page, search });
   const { data: analytics, isLoading: analyticsLoading } = useTestsAnalytics(period);
   const deleteTest = useDeleteTest();
+  const exportBulk = useExportBulkTests();
+  const exportSingle = useExportTest();
 
   const columns: Column<Test>[] = [
     { key: 'title', label: 'Title' },
@@ -50,13 +57,28 @@ export default function TestsPage() {
       key: 'actions',
       label: '',
       render: (t) => (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={(e) => { e.stopPropagation(); setDeleteId(t._id); }}
-        >
-          <Trash2 className="h-4 w-4 text-destructive" />
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              exportSingle.mutate(t._id, {
+                onSuccess: () => toast.success('Test exported'),
+                onError: () => toast.error('Export failed'),
+              });
+            }}
+          >
+            <Download className="h-4 w-4 text-muted-foreground" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => { e.stopPropagation(); setDeleteId(t._id); }}
+          >
+            <Trash2 className="h-4 w-4 text-destructive" />
+          </Button>
+        </div>
       ),
     },
   ];
@@ -150,8 +172,37 @@ export default function TestsPage() {
         </div>
       </div>
 
-      <div className="w-64">
-        <SearchInput value={search} onChange={(v) => { setSearch(v); setPage(1); }} placeholder="Search tests..." />
+      {/* Toolbar: search + actions */}
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="w-64">
+          <SearchInput value={search} onChange={(v) => { setSearch(v); setPage(1); }} placeholder="Search tests..." />
+        </div>
+        <div className="flex items-center gap-2 ml-auto">
+          <Button variant="outline" size="sm" onClick={() => generateTemplateXLSX()}>
+            <FileDown className="h-4 w-4 mr-2" />
+            Template
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => setImportDialogOpen(true)}>
+            <Upload className="h-4 w-4 mr-2" />
+            Import
+          </Button>
+          {selectedTestIds.size > 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={exportBulk.isPending}
+              onClick={() => {
+                exportBulk.mutate([...selectedTestIds], {
+                  onSuccess: () => { toast.success('Tests exported'); setSelectedTestIds(new Set()); },
+                  onError: () => toast.error('Export failed'),
+                });
+              }}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Export Selected ({selectedTestIds.size})
+            </Button>
+          )}
+        </div>
       </div>
 
       <DataTable
@@ -161,6 +212,9 @@ export default function TestsPage() {
         onPageChange={setPage}
         isLoading={isLoading}
         onRowClick={(t) => router.push(`/dashboard/tests/${t._id}`)}
+        selectable
+        selectedIds={selectedTestIds}
+        onSelectionChange={setSelectedTestIds}
       />
 
       <ConfirmDialog
@@ -178,6 +232,8 @@ export default function TestsPage() {
           }
         }}
       />
+
+      <TestImportDialog open={importDialogOpen} onOpenChange={setImportDialogOpen} />
     </div>
   );
 }

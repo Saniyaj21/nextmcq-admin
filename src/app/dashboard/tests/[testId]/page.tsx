@@ -6,14 +6,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Download } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useExportTest } from '@/hooks/use-test-import-export';
+import { toast } from 'sonner';
 import type { Question } from '@/types';
 
 export default function TestDetailPage({ params }: { params: Promise<{ testId: string }> }) {
   const { testId } = use(params);
   const { data, isLoading } = useTest(testId);
   const router = useRouter();
+  const exportTest = useExportTest();
 
   if (isLoading) {
     return (
@@ -40,6 +43,21 @@ export default function TestDetailPage({ params }: { params: Promise<{ testId: s
         <Badge variant={test.isPublic ? 'default' : 'secondary'}>
           {test.isPublic ? 'Public' : 'Private'}
         </Badge>
+        <Button
+          variant="outline"
+          size="sm"
+          className="ml-auto"
+          disabled={exportTest.isPending}
+          onClick={() => {
+            exportTest.mutate(testId, {
+              onSuccess: () => toast.success('Test exported'),
+              onError: () => toast.error('Export failed'),
+            });
+          }}
+        >
+          <Download className="h-4 w-4 mr-2" />
+          Export XLSX
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

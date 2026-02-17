@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Checkbox } from '@/components/ui/checkbox';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Pagination } from '@/types';
 
@@ -26,6 +27,9 @@ interface DataTableProps<T> {
   onPageChange?: (page: number) => void;
   isLoading?: boolean;
   onRowClick?: (item: T) => void;
+  selectable?: boolean;
+  selectedIds?: Set<string>;
+  onSelectionChange?: (ids: Set<string>) => void;
 }
 
 export function DataTable<T extends { _id: string }>({
@@ -35,7 +39,35 @@ export function DataTable<T extends { _id: string }>({
   onPageChange,
   isLoading,
   onRowClick,
+  selectable,
+  selectedIds,
+  onSelectionChange,
 }: DataTableProps<T>) {
+  const allOnPageSelected = selectable && data.length > 0 && data.every((item) => selectedIds?.has(item._id));
+  const someOnPageSelected = selectable && data.some((item) => selectedIds?.has(item._id));
+
+  const toggleAll = () => {
+    if (!onSelectionChange || !selectedIds) return;
+    const next = new Set(selectedIds);
+    if (allOnPageSelected) {
+      data.forEach((item) => next.delete(item._id));
+    } else {
+      data.forEach((item) => next.add(item._id));
+    }
+    onSelectionChange(next);
+  };
+
+  const toggleOne = (id: string) => {
+    if (!onSelectionChange || !selectedIds) return;
+    const next = new Set(selectedIds);
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
+    onSelectionChange(next);
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-3">
@@ -52,6 +84,15 @@ export function DataTable<T extends { _id: string }>({
         <Table>
           <TableHeader>
             <TableRow>
+              {selectable && (
+                <TableHead className="w-10">
+                  <Checkbox
+                    checked={allOnPageSelected ? true : someOnPageSelected ? 'indeterminate' : false}
+                    onCheckedChange={toggleAll}
+                    aria-label="Select all"
+                  />
+                </TableHead>
+              )}
               {columns.map((col) => (
                 <TableHead key={col.key}>{col.label}</TableHead>
               ))}
@@ -60,7 +101,7 @@ export function DataTable<T extends { _id: string }>({
           <TableBody>
             {data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={columns.length} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={columns.length + (selectable ? 1 : 0)} className="text-center py-8 text-muted-foreground">
                   No data found
                 </TableCell>
               </TableRow>
@@ -71,6 +112,15 @@ export function DataTable<T extends { _id: string }>({
                   className={onRowClick ? 'cursor-pointer hover:bg-muted/50' : ''}
                   onClick={() => onRowClick?.(item)}
                 >
+                  {selectable && (
+                    <TableCell className="w-10" onClick={(e) => e.stopPropagation()}>
+                      <Checkbox
+                        checked={selectedIds?.has(item._id) ?? false}
+                        onCheckedChange={() => toggleOne(item._id)}
+                        aria-label={`Select row`}
+                      />
+                    </TableCell>
+                  )}
                   {columns.map((col) => (
                     <TableCell key={col.key}>
                       {col.render
