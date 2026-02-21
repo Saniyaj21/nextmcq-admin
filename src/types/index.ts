@@ -127,6 +127,14 @@ export interface Banner {
   createdAt: string;
 }
 
+export interface Subject {
+  _id: string;
+  name: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Post {
   _id: string;
   type: 'teacher_test_created' | 'student_test_attempt' | 'user_joined' | 'user_post';

@@ -21,6 +21,7 @@ import {
   Download,
   ScrollText,
   Settings,
+  BookOpen,
 } from 'lucide-react';
 
 const navItems = [
@@ -31,6 +32,7 @@ const navItems = [
   { href: '/dashboard/feedback', label: 'Feedback', icon: MessageSquare },
   { href: '/dashboard/institutes', label: 'Institutes', icon: Building2 },
   { href: '/dashboard/banners', label: 'Banners', icon: Image },
+  { href: '/dashboard/subjects', label: 'Subjects', icon: BookOpen },
   { href: '/dashboard/monthly-rewards', label: 'Monthly Rewards', icon: Trophy },
   { href: '/dashboard/posts', label: 'Posts', icon: Newspaper },
   { href: '/dashboard/attempts', label: 'Attempts', icon: ClipboardList },
