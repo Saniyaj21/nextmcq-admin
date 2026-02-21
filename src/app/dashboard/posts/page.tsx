@@ -7,14 +7,16 @@ import { StatusBadge } from '@/components/status-badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ConfirmDialog } from '@/components/confirm-dialog';
+import { CreatePostDialog } from '@/components/create-post-dialog';
 import { toast } from 'sonner';
 import type { Post } from '@/types';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Plus } from 'lucide-react';
 
 export default function PostsPage() {
   const [page, setPage] = useState(1);
   const [type, setType] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [createOpen, setCreateOpen] = useState(false);
 
   const { data, isLoading } = usePosts({ page, type: type || undefined });
   const deletePost = useDeletePost();
@@ -51,7 +53,13 @@ export default function PostsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Posts</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Posts</h1>
+        <Button onClick={() => setCreateOpen(true)}>
+          <Plus className="h-4 w-4 mr-2" />
+          Create Post
+        </Button>
+      </div>
 
       <Select value={type || 'all'} onValueChange={(v) => { setType(v === 'all' ? '' : v); setPage(1); }}>
         <SelectTrigger className="w-56">
@@ -73,6 +81,8 @@ export default function PostsPage() {
         onPageChange={setPage}
         isLoading={isLoading}
       />
+
+      <CreatePostDialog open={createOpen} onOpenChange={setCreateOpen} />
 
       <ConfirmDialog
         open={!!deleteId}

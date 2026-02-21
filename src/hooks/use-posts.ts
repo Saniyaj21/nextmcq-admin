@@ -12,6 +12,19 @@ export function usePosts(params: { page?: number; type?: string } = {}) {
   });
 }
 
+export function useCreatePost() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: { title: string; description: string }) => {
+      const res = await api.post('/posts', data);
+      return res.data;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['posts'] });
+    },
+  });
+}
+
 export function useDeletePost() {
   const qc = useQueryClient();
   return useMutation({
