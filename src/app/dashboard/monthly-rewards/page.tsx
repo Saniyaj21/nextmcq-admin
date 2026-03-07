@@ -1,25 +1,20 @@
 'use client';
 
 import { useState } from 'react';
-import { useMonthlyRewards, useMonthlyRewardJobs, useTriggerMonthlyRewards } from '@/hooks/use-monthly-rewards';
+import { useMonthlyRewards, useMonthlyRewardJobs } from '@/hooks/use-monthly-rewards';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { StatusBadge } from '@/components/status-badge';
 import { DataTable, type Column } from '@/components/data-table';
-import { ConfirmDialog } from '@/components/confirm-dialog';
-import { toast } from 'sonner';
 import type { MonthlyReward, MonthlyRewardJob } from '@/types';
 
 export default function MonthlyRewardsPage() {
   const [category, setCategory] = useState('');
-  const [showTriggerDialog, setShowTriggerDialog] = useState(false);
 
   const { data: rewards, isLoading: rewardsLoading } = useMonthlyRewards({
     category: category || undefined,
   });
   const { data: jobs, isLoading: jobsLoading } = useMonthlyRewardJobs();
-  const trigger = useTriggerMonthlyRewards();
 
   const rewardColumns: Column<MonthlyReward>[] = [
     { key: 'rank', label: 'Rank', render: (r) => `#${r.rank}` },
@@ -62,9 +57,6 @@ export default function MonthlyRewardsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Monthly Rewards</h1>
-        <Button onClick={() => setShowTriggerDialog(true)}>
-          Trigger Reward Processing
-        </Button>
       </div>
 
       {/* Jobs */}
@@ -104,20 +96,6 @@ export default function MonthlyRewardsPage() {
         </CardContent>
       </Card>
 
-      <ConfirmDialog
-        open={showTriggerDialog}
-        onOpenChange={setShowTriggerDialog}
-        title="Trigger Monthly Rewards"
-        description="This will create reward processing jobs for the previous month. Are you sure?"
-        variant="default"
-        loading={trigger.isPending}
-        onConfirm={() => {
-          trigger.mutate(undefined, {
-            onSuccess: () => { toast.success('Reward jobs triggered'); setShowTriggerDialog(false); },
-            onError: () => toast.error('Failed to trigger rewards'),
-          });
-        }}
-      />
     </div>
   );
 }

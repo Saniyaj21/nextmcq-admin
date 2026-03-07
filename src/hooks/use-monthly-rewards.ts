@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
 import type { MonthlyReward, MonthlyRewardJob } from '@/types';
 
@@ -22,15 +22,3 @@ export function useMonthlyRewardJobs() {
   });
 }
 
-export function useTriggerMonthlyRewards() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async (data?: { month?: number; year?: number }) => {
-      const res = await api.post('/monthly-rewards/trigger', data || {});
-      return res.data;
-    },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['monthly-reward-jobs'] });
-    },
-  });
-}
