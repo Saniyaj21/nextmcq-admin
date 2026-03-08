@@ -9,6 +9,7 @@ import { DataTable, type Column } from '@/components/data-table';
 import { SearchInput } from '@/components/search-input';
 import { TestImportDialog } from '@/components/test-import-dialog';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ConfirmDialog } from '@/components/confirm-dialog';
@@ -29,10 +30,11 @@ export default function TestsPage() {
   const [search, setSearch] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [period, setPeriod] = useState<'7d' | '30d' | '90d'>('30d');
+  const [classFilter, setClassFilter] = useState('');
   const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [selectedTestIds, setSelectedTestIds] = useState<Set<string>>(new Set());
 
-  const { data, isLoading } = useTests({ page, search });
+  const { data, isLoading } = useTests({ page, search, class: classFilter || undefined });
   const { data: analytics, isLoading: analyticsLoading } = useTestsAnalytics(period);
   const deleteTest = useDeleteTest();
   const exportBulk = useExportBulkTests();
@@ -41,6 +43,7 @@ export default function TestsPage() {
   const columns: Column<Test>[] = [
     { key: 'title', label: 'Title' },
     { key: 'subject', label: 'Subject' },
+    { key: 'class', label: 'Class', render: (t) => t.class ? (t.class === 'other' ? 'Other' : `Class ${t.class}`) : '-' },
     {
       key: 'createdBy',
       label: 'Creator',
@@ -177,6 +180,20 @@ export default function TestsPage() {
         <div className="w-64">
           <SearchInput value={search} onChange={(v) => { setSearch(v); setPage(1); }} placeholder="Search tests..." />
         </div>
+        <Select value={classFilter} onValueChange={(v) => { setClassFilter(v === 'all' ? '' : v); setPage(1); }}>
+          <SelectTrigger className="w-40">
+            <SelectValue placeholder="All Classes" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Classes</SelectItem>
+            <SelectItem value="8">Class 8</SelectItem>
+            <SelectItem value="9">Class 9</SelectItem>
+            <SelectItem value="10">Class 10</SelectItem>
+            <SelectItem value="11">Class 11</SelectItem>
+            <SelectItem value="12">Class 12</SelectItem>
+            <SelectItem value="other">Other</SelectItem>
+          </SelectContent>
+        </Select>
         <div className="flex items-center gap-2 ml-auto">
           <Button variant="outline" size="sm" onClick={() => generateTemplateXLSX()}>
             <FileDown className="h-4 w-4 mr-2" />

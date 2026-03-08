@@ -26,9 +26,10 @@ export default function UsersPage() {
   const [search, setSearch] = useState('');
   const [role, setRole] = useState('');
   const [status, setStatus] = useState('');
+  const [classFilter, setClassFilter] = useState('');
   const [period, setPeriod] = useState<'7d' | '30d' | '90d'>('30d');
 
-  const { data, isLoading } = useUsers({ page, search, role: role || undefined, status: status || undefined });
+  const { data, isLoading } = useUsers({ page, search, role: role || undefined, status: status || undefined, class: classFilter || undefined });
   const { data: analytics, isLoading: analyticsLoading } = useUsersAnalytics(period);
   const toggleStatus = useToggleUserStatus();
 
@@ -41,6 +42,7 @@ export default function UsersPage() {
       label: 'Institute',
       render: (u) => (typeof u.institute === 'object' && u.institute ? u.institute.name : '-'),
     },
+    { key: 'class', label: 'Class', render: (u) => u.class ? (u.class === 'other' ? 'Other' : `Class ${u.class}`) : '-' },
     { key: 'level', label: 'Level', render: (u) => u.rewards?.level ?? 1 },
     {
       key: 'isActive',
@@ -195,6 +197,20 @@ export default function UsersPage() {
             <SelectItem value="all">All Status</SelectItem>
             <SelectItem value="active">Active</SelectItem>
             <SelectItem value="inactive">Inactive</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={classFilter} onValueChange={(v) => { setClassFilter(v === 'all' ? '' : v); setPage(1); }}>
+          <SelectTrigger className="w-40">
+            <SelectValue placeholder="All Classes" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Classes</SelectItem>
+            <SelectItem value="8">Class 8</SelectItem>
+            <SelectItem value="9">Class 9</SelectItem>
+            <SelectItem value="10">Class 10</SelectItem>
+            <SelectItem value="11">Class 11</SelectItem>
+            <SelectItem value="12">Class 12</SelectItem>
+            <SelectItem value="other">Other</SelectItem>
           </SelectContent>
         </Select>
       </div>

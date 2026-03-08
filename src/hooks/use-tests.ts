@@ -18,7 +18,7 @@ export function useTestsAnalytics(period: '7d' | '30d' | '90d' = '30d') {
   });
 }
 
-export function useTests(params: { page?: number; search?: string } = {}) {
+export function useTests(params: { page?: number; search?: string; class?: string } = {}) {
   return useQuery({
     queryKey: ['tests', params],
     queryFn: async () => {

@@ -23,6 +23,7 @@ interface UsersParams {
   search?: string;
   role?: string;
   status?: string;
+  class?: string;
 }
 
 export function useUsers(params: UsersParams = {}) {

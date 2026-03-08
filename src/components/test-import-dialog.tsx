@@ -146,6 +146,9 @@ export function TestImportDialog({ open, onOpenChange }: TestImportDialogProps) 
                 {parsed.test.chapter && (
                   <span>Chapter: <span className="text-foreground">{parsed.test.chapter}</span></span>
                 )}
+                {parsed.test.class && (
+                  <span>Class: <span className="text-foreground">{parsed.test.class}</span></span>
+                )}
               </div>
             </div>
           )}

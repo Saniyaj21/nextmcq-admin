@@ -45,6 +45,16 @@ export default function UserDetailPage({ params }: { params: Promise<{ userId: s
     );
   };
 
+  const handleClassChange = (cls: string) => {
+    updateUser.mutate(
+      { userId, data: { class: cls === 'none' ? null : cls } as Record<string, unknown> },
+      {
+        onSuccess: () => toast.success('Class updated'),
+        onError: () => toast.error('Failed to update class'),
+      }
+    );
+  };
+
   const handleToggleStatus = () => {
     updateUser.mutate(
       { userId, data: { isActive: !user.isActive } as Record<string, unknown> },
@@ -116,6 +126,10 @@ export default function UserDetailPage({ params }: { params: Promise<{ userId: s
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Institute</span>
                   <span>{typeof user.institute === 'object' && user.institute ? user.institute.name : 'None'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Class</span>
+                  <span>{user.class ? (user.class === 'other' ? 'Other' : `Class ${user.class}`) : 'None'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Verified</span>
@@ -199,6 +213,23 @@ export default function UserDetailPage({ params }: { params: Promise<{ userId: s
                     <SelectItem value="student">Student</SelectItem>
                     <SelectItem value="teacher">Teacher</SelectItem>
                     <SelectItem value="admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Class:</span>
+                <Select value={user.class || 'none'} onValueChange={handleClassChange}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    <SelectItem value="8">Class 8</SelectItem>
+                    <SelectItem value="9">Class 9</SelectItem>
+                    <SelectItem value="10">Class 10</SelectItem>
+                    <SelectItem value="11">Class 11</SelectItem>
+                    <SelectItem value="12">Class 12</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

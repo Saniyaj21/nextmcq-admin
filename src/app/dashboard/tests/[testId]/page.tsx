@@ -66,6 +66,7 @@ export default function TestDetailPage({ params }: { params: Promise<{ testId: s
           <CardContent className="space-y-3 text-sm">
             <div className="flex justify-between"><span className="text-muted-foreground">Subject</span><span>{test.subject}</span></div>
             {test.chapter && <div className="flex justify-between"><span className="text-muted-foreground">Chapter</span><span>{test.chapter}</span></div>}
+            {test.class && <div className="flex justify-between"><span className="text-muted-foreground">Class</span><span>{test.class === 'other' ? 'Other' : `Class ${test.class}`}</span></div>}
             <div className="flex justify-between"><span className="text-muted-foreground">Time Limit</span><span>{test.timeLimit} min</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Coin Fee</span><span>{test.coinFee}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Creator</span><span>{creator?.name || creator?.email || '-'}</span></div>

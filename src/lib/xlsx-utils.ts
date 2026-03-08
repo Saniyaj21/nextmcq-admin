@@ -10,6 +10,7 @@ export interface ParsedTestData {
     title: string;
     subject: string;
     chapter?: string;
+    class?: string | null;
     description?: string;
     timeLimit: number;
     coinFee: number;
@@ -36,6 +37,7 @@ const METADATA_KEYS: Record<string, keyof ParsedTestData['test']> = {
   'test title': 'title',
   'subject': 'subject',
   'chapter': 'chapter',
+  'class': 'class',
   'description': 'description',
   'time limit': 'timeLimit',
   'coin fee': 'coinFee',
@@ -169,6 +171,7 @@ export async function parseXLSX(file: File): Promise<ParsedTestData> {
       title: meta.title!,
       subject: meta.subject!,
       chapter: meta.chapter || undefined,
+      class: meta.class || null,
       description: meta.description || undefined,
       timeLimit,
       coinFee,
@@ -189,6 +192,7 @@ function buildSheetData(test: Test, questions: Question[]): unknown[][] {
   rows.push(['Test Title', test.title]);
   rows.push(['Subject', test.subject]);
   rows.push(['Chapter', test.chapter || '']);
+  rows.push(['Class', test.class || '']);
   rows.push(['Description', test.description || '']);
   rows.push(['Time Limit', test.timeLimit]);
   rows.push(['Coin Fee', test.coinFee]);
@@ -295,6 +299,7 @@ export function generateTemplateXLSX(): void {
     ['Test Title', 'My Test Name'],
     ['Subject', 'Physics'],
     ['Chapter', ''],
+    ['Class', ''],
     ['Description', ''],
     ['Time Limit', 30],
     ['Coin Fee', 0],
