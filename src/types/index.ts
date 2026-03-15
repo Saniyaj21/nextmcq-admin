@@ -125,6 +125,7 @@ export interface Banner {
   _id: string;
   title: string;
   imageURL: string;
+  imagePublicId?: string;
   isActive: boolean;
   createdAt: string;
 }

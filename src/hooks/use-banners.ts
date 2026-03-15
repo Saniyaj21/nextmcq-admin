@@ -12,10 +12,27 @@ export function useBanners() {
   });
 }
 
+export function useUploadBannerImage() {
+  return useMutation({
+    mutationFn: async (imageData: string) => {
+      const res = await api.post('/banners/upload-image', { imageData });
+      return res.data as { imageURL: string; publicId: string };
+    },
+  });
+}
+
+export function useDeleteBannerImage() {
+  return useMutation({
+    mutationFn: async (publicId: string) => {
+      await api.post('/banners/delete-image', { publicId });
+    },
+  });
+}
+
 export function useCreateBanner() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (data: { title: string; imageURL: string; isActive?: boolean }) => {
+    mutationFn: async (data: { title: string; imageURL: string; imagePublicId?: string; isActive?: boolean }) => {
       const res = await api.post('/banners', data);
       return res.data.banner;
     },
