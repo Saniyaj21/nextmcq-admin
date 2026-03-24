@@ -34,10 +34,11 @@ export function TestImportDialog({ open, onOpenChange }: TestImportDialogProps) 
   const [teacherId, setTeacherId] = useState<string>('');
   const [fileName, setFileName] = useState<string>('');
 
-  const { data: usersData } = useUsers({ role: 'teacher', limit: 200 } as Parameters<typeof useUsers>[0]);
+  const { data: teachersData } = useUsers({ role: 'teacher', limit: 200 } as Parameters<typeof useUsers>[0]);
+  const { data: adminsData } = useUsers({ role: 'admin', limit: 50 } as Parameters<typeof useUsers>[0]);
   const importTest = useImportTest();
 
-  const teachers = usersData?.users ?? [];
+  const creators = [...(adminsData?.users ?? []), ...(teachersData?.users ?? [])];
 
   const reset = () => {
     setParsed(null);
@@ -156,15 +157,15 @@ export function TestImportDialog({ open, onOpenChange }: TestImportDialogProps) 
           {/* Teacher select */}
           {parsed && (
             <div>
-              <label className="text-sm font-medium mb-1.5 block">Creator (Teacher)</label>
+              <label className="text-sm font-medium mb-1.5 block">Creator</label>
               <Select value={teacherId} onValueChange={setTeacherId}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a teacher..." />
+                  <SelectValue placeholder="Select a creator..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {teachers.map((t) => (
+                  {creators.map((t) => (
                     <SelectItem key={t._id} value={t._id}>
-                      {t.name} ({t.email})
+                      {t.name} ({t.email}) {t.role === 'admin' ? '• Admin' : ''}
                     </SelectItem>
                   ))}
                 </SelectContent>
