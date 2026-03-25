@@ -95,6 +95,38 @@ export default function EditTestPage({ params }: { params: Promise<{ testId: str
     });
   };
 
+  const addQuestion = () => {
+    setQuestions((prev) => [
+      ...prev,
+      { question: '', options: ['', '', '', ''], correctAnswer: 0, explanation: '' },
+    ]);
+  };
+
+  const removeQuestion = (index: number) => {
+    setQuestions((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const addOption = (qIndex: number) => {
+    setQuestions((prev) => {
+      const updated = [...prev];
+      if (updated[qIndex].options.length >= 5) return prev;
+      updated[qIndex] = { ...updated[qIndex], options: [...updated[qIndex].options, ''] };
+      return updated;
+    });
+  };
+
+  const removeOption = (qIndex: number, oIndex: number) => {
+    setQuestions((prev) => {
+      const updated = [...prev];
+      const q = updated[qIndex];
+      if (q.options.length <= 2) return prev;
+      const opts = q.options.filter((_, i) => i !== oIndex);
+      const correctAnswer = q.correctAnswer >= opts.length ? opts.length - 1 : q.correctAnswer > oIndex ? q.correctAnswer - 1 : q.correctAnswer;
+      updated[qIndex] = { ...q, options: opts, correctAnswer };
+      return updated;
+    });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     updateTest.mutate(
@@ -197,14 +229,27 @@ export default function EditTestPage({ params }: { params: Promise<{ testId: str
 
         {/* Questions */}
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Questions ({questions.length})</CardTitle>
+            <Button type="button" variant="outline" size="sm" onClick={addQuestion}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Question
+            </Button>
           </CardHeader>
           <CardContent className="space-y-6">
             {questions.map((q, qi) => (
               <div key={q._id || qi} className="border rounded-md p-4 space-y-3">
-                <div className="flex items-start justify-between gap-2">
+                <div className="flex items-center justify-between gap-2">
                   <Label className="font-medium text-base">Q{qi + 1}</Label>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeQuestion(qi)}
+                    disabled={questions.length <= 1}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
                 </div>
                 <div className="space-y-2">
                   <Label>Question Text</Label>
@@ -216,7 +261,15 @@ export default function EditTestPage({ params }: { params: Promise<{ testId: str
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Options</Label>
+                  <div className="flex items-center justify-between">
+                    <Label>Options</Label>
+                    {q.options.length < 5 && (
+                      <Button type="button" variant="ghost" size="sm" onClick={() => addOption(qi)}>
+                        <Plus className="h-3 w-3 mr-1" />
+                        Add Option
+                      </Button>
+                    )}
+                  </div>
                   {q.options.map((opt, oi) => (
                     <div key={oi} className="flex items-center gap-2">
                       <span className={`text-sm font-medium w-6 ${oi === q.correctAnswer ? 'text-green-600' : 'text-muted-foreground'}`}>
@@ -228,6 +281,11 @@ export default function EditTestPage({ params }: { params: Promise<{ testId: str
                         required
                         className={oi === q.correctAnswer ? 'border-green-500' : ''}
                       />
+                      {q.options.length > 2 && (
+                        <Button type="button" variant="ghost" size="sm" onClick={() => removeOption(qi, oi)} className="px-2">
+                          <Trash2 className="h-3 w-3 text-muted-foreground" />
+                        </Button>
+                      )}
                     </div>
                   ))}
                 </div>
