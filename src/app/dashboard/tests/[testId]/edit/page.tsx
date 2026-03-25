@@ -113,7 +113,7 @@ export default function EditTestPage({ params }: { params: Promise<{ testId: str
       {
         onSuccess: () => {
           toast.success('Test updated');
-          router.push(`/dashboard/tests/${testId}`);
+          router.replace(`/dashboard/tests/${testId}`);
         },
         onError: () => toast.error('Failed to update test'),
       }
