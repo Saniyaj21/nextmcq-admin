@@ -229,12 +229,8 @@ export default function EditTestPage({ params }: { params: Promise<{ testId: str
 
         {/* Questions */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader>
             <CardTitle>Questions ({questions.length})</CardTitle>
-            <Button type="button" variant="outline" size="sm" onClick={addQuestion}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Question
-            </Button>
           </CardHeader>
           <CardContent className="space-y-6">
             {questions.map((q, qi) => (
@@ -317,6 +313,10 @@ export default function EditTestPage({ params }: { params: Promise<{ testId: str
                 </div>
               </div>
             ))}
+            <Button type="button" variant="default" size="sm" onClick={addQuestion}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Question
+            </Button>
           </CardContent>
         </Card>
 
