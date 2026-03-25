@@ -15,7 +15,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ConfirmDialog } from '@/components/confirm-dialog';
 import { toast } from 'sonner';
 import type { Test } from '@/types';
-import { Trash2, Upload, Download, FileDown } from 'lucide-react';
+import { Trash2, Upload, Download, FileDown, Pencil } from 'lucide-react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, PieChart, Pie, Cell, Legend,
@@ -61,6 +61,13 @@ export default function TestsPage() {
       label: '',
       render: (t) => (
         <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => { e.stopPropagation(); router.push(`/dashboard/tests/${t._id}/edit`); }}
+          >
+            <Pencil className="h-4 w-4 text-muted-foreground" />
+          </Button>
           <Button
             variant="ghost"
             size="sm"

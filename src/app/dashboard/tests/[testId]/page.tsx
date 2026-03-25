@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Download } from 'lucide-react';
+import { ArrowLeft, Download, Pencil } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useExportTest } from '@/hooks/use-test-import-export';
 import { toast } from 'sonner';
@@ -47,6 +47,14 @@ export default function TestDetailPage({ params }: { params: Promise<{ testId: s
           variant="outline"
           size="sm"
           className="ml-auto"
+          onClick={() => router.push(`/dashboard/tests/${testId}/edit`)}
+        >
+          <Pencil className="h-4 w-4 mr-2" />
+          Edit
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
           disabled={exportTest.isPending}
           onClick={() => {
             exportTest.mutate(testId, {

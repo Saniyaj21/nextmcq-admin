@@ -42,6 +42,20 @@ export function useTest(testId: string) {
   });
 }
 
+export function useUpdateTest() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ testId, data }: { testId: string; data: Record<string, unknown> }) => {
+      const res = await api.put(`/tests/${testId}`, data);
+      return res.data;
+    },
+    onSuccess: (_data, variables) => {
+      qc.invalidateQueries({ queryKey: ['tests'] });
+      qc.invalidateQueries({ queryKey: ['test', variables.testId] });
+    },
+  });
+}
+
 export function useDeleteTest() {
   const qc = useQueryClient();
   return useMutation({
