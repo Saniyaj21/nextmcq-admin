@@ -31,6 +31,7 @@ export default function EditTestPage({ params }: { params: Promise<{ testId: str
   const { data: subjects } = useSubjects();
   const updateTest = useUpdateTest();
 
+  const [initialized, setInitialized] = useState(false);
   const [title, setTitle] = useState('');
   const [subject, setSubject] = useState('');
   const [chapter, setChapter] = useState('');
@@ -42,7 +43,7 @@ export default function EditTestPage({ params }: { params: Promise<{ testId: str
   const [questions, setQuestions] = useState<QuestionForm[]>([]);
 
   useEffect(() => {
-    if (data?.test) {
+    if (data?.test && !initialized) {
       const t = data.test;
       setTitle(t.title);
       setSubject(t.subject);
@@ -61,10 +62,11 @@ export default function EditTestPage({ params }: { params: Promise<{ testId: str
           explanation: q.explanation || '',
         }))
       );
+      setInitialized(true);
     }
-  }, [data]);
+  }, [data, initialized]);
 
-  if (isLoading) {
+  if (isLoading || !initialized) {
     return (
       <div className="space-y-4">
         <Skeleton className="h-8 w-48" />
@@ -142,12 +144,15 @@ export default function EditTestPage({ params }: { params: Promise<{ testId: str
               </div>
               <div className="space-y-2">
                 <Label>Subject</Label>
-                <Select value={subject} onValueChange={setSubject}>
+                <Select value={subject || undefined} onValueChange={setSubject}>
                   <SelectTrigger><SelectValue placeholder="Select subject" /></SelectTrigger>
                   <SelectContent>
                     {subjects?.filter((s) => s.isActive).map((s) => (
                       <SelectItem key={s._id} value={s.name}>{s.name}</SelectItem>
                     ))}
+                    {subject && !subjects?.some((s) => s.isActive && s.name === subject) && (
+                      <SelectItem value={subject}>{subject}</SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
