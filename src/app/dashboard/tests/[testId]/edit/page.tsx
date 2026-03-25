@@ -3,6 +3,7 @@
 import { use, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTest, useUpdateTest } from '@/hooks/use-tests';
+import { useSubjects } from '@/hooks/use-subjects';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -27,6 +28,7 @@ export default function EditTestPage({ params }: { params: Promise<{ testId: str
   const { testId } = use(params);
   const router = useRouter();
   const { data, isLoading } = useTest(testId);
+  const { data: subjects } = useSubjects();
   const updateTest = useUpdateTest();
 
   const [title, setTitle] = useState('');
@@ -139,8 +141,15 @@ export default function EditTestPage({ params }: { params: Promise<{ testId: str
                 <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} required />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="subject">Subject</Label>
-                <Input id="subject" value={subject} onChange={(e) => setSubject(e.target.value)} required />
+                <Label>Subject</Label>
+                <Select value={subject} onValueChange={setSubject}>
+                  <SelectTrigger><SelectValue placeholder="Select subject" /></SelectTrigger>
+                  <SelectContent>
+                    {subjects?.filter((s) => s.isActive).map((s) => (
+                      <SelectItem key={s._id} value={s.name}>{s.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="chapter">Chapter</Label>
