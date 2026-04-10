@@ -37,6 +37,7 @@ export default function EditTestPage({ params }: { params: Promise<{ testId: str
   const [chapter, setChapter] = useState('');
   const [description, setDescription] = useState('');
   const [testClass, setTestClass] = useState('');
+  const [testSemester, setTestSemester] = useState('');
   const [timeLimit, setTimeLimit] = useState(10);
   const [coinFee, setCoinFee] = useState(0);
   const [isPublic, setIsPublic] = useState(false);
@@ -50,6 +51,7 @@ export default function EditTestPage({ params }: { params: Promise<{ testId: str
       setChapter(t.chapter || '');
       setDescription(t.description || '');
       setTestClass(t.class || '');
+      setTestSemester(t.semester || '');
       setTimeLimit(t.timeLimit);
       setCoinFee(t.coinFee);
       setIsPublic(t.isPublic);
@@ -138,6 +140,7 @@ export default function EditTestPage({ params }: { params: Promise<{ testId: str
           chapter: chapter || undefined,
           description: description || undefined,
           class: testClass || null,
+          semester: (testClass === '11' || testClass === '12') ? (testSemester || null) : null,
           timeLimit,
           coinFee,
           isPublic,
@@ -162,9 +165,17 @@ export default function EditTestPage({ params }: { params: Promise<{ testId: str
           Back
         </Button>
         <h1 className="text-3xl font-bold">Edit Test</h1>
+        <div className="ml-auto flex gap-3">
+          <Button type="button" variant="outline" onClick={() => router.back()}>
+            Cancel
+          </Button>
+          <Button type="submit" form="edit-test-form" disabled={updateTest.isPending}>
+            {updateTest.isPending ? 'Saving...' : 'Save Changes'}
+          </Button>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form id="edit-test-form" onSubmit={handleSubmit} className="space-y-6">
         {/* Test Details */}
         <Card>
           <CardHeader><CardTitle>Test Details</CardTitle></CardHeader>
@@ -194,19 +205,29 @@ export default function EditTestPage({ params }: { params: Promise<{ testId: str
               </div>
               <div className="space-y-2">
                 <Label>Class</Label>
-                <Select value={testClass || 'none'} onValueChange={(v) => setTestClass(v === 'none' ? '' : v)}>
+                <Select value={testClass || 'none'} onValueChange={(v) => { setTestClass(v === 'none' ? '' : v); setTestSemester(''); }}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">All Classes</SelectItem>
-                    <SelectItem value="8">Class 8</SelectItem>
-                    <SelectItem value="9">Class 9</SelectItem>
                     <SelectItem value="10">Class 10</SelectItem>
                     <SelectItem value="11">Class 11</SelectItem>
                     <SelectItem value="12">Class 12</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+              {(testClass === '11' || testClass === '12') && (
+              <div className="space-y-2">
+                <Label>Semester</Label>
+                <Select value={testSemester || 'all'} onValueChange={(v) => setTestSemester(v === 'all' ? '' : v)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Semesters</SelectItem>
+                    <SelectItem value="1">Semester 1</SelectItem>
+                    <SelectItem value="2">Semester 2</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="timeLimit">Time Limit (minutes)</Label>
                 <Input id="timeLimit" type="number" min={1} max={60} value={timeLimit} onChange={(e) => setTimeLimit(Number(e.target.value))} required />

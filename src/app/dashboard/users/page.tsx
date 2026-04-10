@@ -27,9 +27,10 @@ export default function UsersPage() {
   const [role, setRole] = useState('');
   const [status, setStatus] = useState('');
   const [classFilter, setClassFilter] = useState('');
+  const [semesterFilter, setSemesterFilter] = useState('');
   const [period, setPeriod] = useState<'7d' | '30d' | '90d'>('30d');
 
-  const { data, isLoading } = useUsers({ page, search, role: role || undefined, status: status || undefined, class: classFilter || undefined });
+  const { data, isLoading } = useUsers({ page, search, role: role || undefined, status: status || undefined, class: classFilter || undefined, semester: semesterFilter || undefined });
   const { data: analytics, isLoading: analyticsLoading } = useUsersAnalytics(period);
   const toggleStatus = useToggleUserStatus();
 
@@ -42,7 +43,12 @@ export default function UsersPage() {
       label: 'Institute',
       render: (u) => (typeof u.institute === 'object' && u.institute ? u.institute.name : '-'),
     },
-    { key: 'class', label: 'Class', render: (u) => u.class ? (u.class === 'other' ? 'Other' : `Class ${u.class}`) : '-' },
+    { key: 'class', label: 'Class', render: (u) => {
+      if (!u.class) return '-';
+      const cls = u.class === 'other' ? 'Other' : `Class ${u.class}`;
+      const sem = (u.class === '11' || u.class === '12') && u.semester ? ` Sem ${u.semester}` : '';
+      return cls + sem;
+    }},
     { key: 'level', label: 'Level', render: (u) => u.rewards?.level ?? 1 },
     {
       key: 'isActive',
@@ -199,20 +205,29 @@ export default function UsersPage() {
             <SelectItem value="inactive">Inactive</SelectItem>
           </SelectContent>
         </Select>
-        <Select value={classFilter} onValueChange={(v) => { setClassFilter(v === 'all' ? '' : v); setPage(1); }}>
+        <Select value={classFilter} onValueChange={(v) => { setClassFilter(v === 'all' ? '' : v); setSemesterFilter(''); setPage(1); }}>
           <SelectTrigger className="w-40">
             <SelectValue placeholder="All Classes" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Classes</SelectItem>
-            <SelectItem value="8">Class 8</SelectItem>
-            <SelectItem value="9">Class 9</SelectItem>
             <SelectItem value="10">Class 10</SelectItem>
             <SelectItem value="11">Class 11</SelectItem>
             <SelectItem value="12">Class 12</SelectItem>
-            <SelectItem value="other">Other</SelectItem>
           </SelectContent>
         </Select>
+        {(classFilter === '11' || classFilter === '12') && (
+          <Select value={semesterFilter} onValueChange={(v) => { setSemesterFilter(v === 'all' ? '' : v); setPage(1); }}>
+            <SelectTrigger className="w-36">
+              <SelectValue placeholder="All Semesters" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Semesters</SelectItem>
+              <SelectItem value="1">Semester 1</SelectItem>
+              <SelectItem value="2">Semester 2</SelectItem>
+            </SelectContent>
+          </Select>
+        )}
       </div>
 
       <DataTable

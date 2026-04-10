@@ -25,6 +25,7 @@ export interface User {
   badges: Badge[];
   referralCode?: string;
   class?: string | null;
+  semester?: string | null;
   subjects?: string[];
   createdAt: string;
   updatedAt: string;
@@ -59,6 +60,7 @@ export interface Test {
   subject: string;
   chapter?: string;
   class?: string | null;
+  semester?: string | null;
   description?: string;
   timeLimit: number;
   coinFee: number;

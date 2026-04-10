@@ -24,6 +24,7 @@ interface UsersParams {
   role?: string;
   status?: string;
   class?: string;
+  semester?: string;
 }
 
 export function useUsers(params: UsersParams = {}) {

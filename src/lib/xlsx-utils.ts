@@ -11,6 +11,7 @@ export interface ParsedTestData {
     subject: string;
     chapter?: string;
     class?: string | null;
+    semester?: string | null;
     description?: string;
     timeLimit: number;
     coinFee: number;
@@ -38,6 +39,7 @@ const METADATA_KEYS: Record<string, keyof ParsedTestData['test']> = {
   'subject': 'subject',
   'chapter': 'chapter',
   'class': 'class',
+  'semester': 'semester',
   'description': 'description',
   'time limit': 'timeLimit',
   'coin fee': 'coinFee',
@@ -172,6 +174,7 @@ export async function parseXLSX(file: File): Promise<ParsedTestData> {
       subject: meta.subject!,
       chapter: meta.chapter || undefined,
       class: meta.class || null,
+      semester: (meta.class === '11' || meta.class === '12') ? (meta.semester || null) : null,
       description: meta.description || undefined,
       timeLimit,
       coinFee,
@@ -193,6 +196,9 @@ function buildSheetData(test: Test, questions: Question[]): unknown[][] {
   rows.push(['Subject', test.subject]);
   rows.push(['Chapter', test.chapter || '']);
   rows.push(['Class', test.class || '']);
+  if (test.class === '11' || test.class === '12') {
+    rows.push(['Semester', test.semester || '']);
+  }
   rows.push(['Description', test.description || '']);
   rows.push(['Time Limit', test.timeLimit]);
   rows.push(['Coin Fee', test.coinFee]);
@@ -299,7 +305,8 @@ export function generateTemplateXLSX(): void {
     ['Test Title', 'My Test Name'],
     ['Subject', 'Physics'],
     ['Chapter', ''],
-    ['Class', ''],
+    ['Class', '10 or 11 or 12'],
+    ['Semester', '1 or 2 (only for Class 11 or 12)'],
     ['Description', ''],
     ['Time Limit', 30],
     ['Coin Fee', 0],

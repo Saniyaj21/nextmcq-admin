@@ -55,6 +55,16 @@ export default function UserDetailPage({ params }: { params: Promise<{ userId: s
     );
   };
 
+  const handleSemesterChange = (sem: string) => {
+    updateUser.mutate(
+      { userId, data: { semester: sem === 'none' ? null : sem } as Record<string, unknown> },
+      {
+        onSuccess: () => toast.success('Semester updated'),
+        onError: () => toast.error('Failed to update semester'),
+      }
+    );
+  };
+
   const handleToggleStatus = () => {
     updateUser.mutate(
       { userId, data: { isActive: !user.isActive } as Record<string, unknown> },
@@ -224,15 +234,27 @@ export default function UserDetailPage({ params }: { params: Promise<{ userId: s
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">None</SelectItem>
-                    <SelectItem value="8">Class 8</SelectItem>
-                    <SelectItem value="9">Class 9</SelectItem>
                     <SelectItem value="10">Class 10</SelectItem>
                     <SelectItem value="11">Class 11</SelectItem>
                     <SelectItem value="12">Class 12</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+              {(user.class === '11' || user.class === '12') && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Semester:</span>
+                <Select value={user.semester || 'none'} onValueChange={handleSemesterChange}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    <SelectItem value="1">Semester 1</SelectItem>
+                    <SelectItem value="2">Semester 2</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              )}
               <Button
                 variant={user.isActive ? 'destructive' : 'default'}
                 onClick={handleToggleStatus}
