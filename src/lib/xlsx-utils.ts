@@ -106,30 +106,44 @@ export async function parseXLSX(file: File): Promise<ParsedTestData> {
   // Parse questions starting after header row
   const questions: ParsedTestData['questions'] = [];
 
+  // Build column index map from header row
+  const headerRow = rows[questionHeaderRow];
+  const colMap: Record<string, number> = {};
+  for (let c = 0; c < headerRow.length; c++) {
+    const hdr = cellValue(headerRow[c]).toLowerCase();
+    if (hdr) colMap[hdr] = c;
+  }
+
+  // Find option columns dynamically (Option A through Option E, whatever is present)
+  const optionColIndices: number[] = [];
+  for (const letter of ['a', 'b', 'c', 'd', 'e']) {
+    const idx = colMap[`option ${letter}`];
+    if (idx !== undefined) optionColIndices.push(idx);
+  }
+
+  // Fallback for sheets with no named option headers: use fixed offsets
+  const hasNumberCol = cellValue(headerRow[0]).toLowerCase() === '#';
+  const offset = hasNumberCol ? 1 : 0;
+  const questionCol = colMap['question'] ?? offset;
+  const correctAnswerCol = colMap['correct answer'] ?? (offset + optionColIndices.length + 1);
+  const explanationCol = colMap['explanation'] ?? (offset + optionColIndices.length + 2);
+
   for (let i = questionHeaderRow + 1; i < rows.length; i++) {
     const row = rows[i];
     // Skip empty rows
-    const questionText = cellValue(row[1]) || cellValue(row[0]);
+    const questionText = cellValue(row[questionCol]) || cellValue(row[0]);
     if (!questionText) continue;
 
-    // Determine column layout based on header
-    const headerRow = rows[questionHeaderRow];
-    const hasNumberCol = cellValue(headerRow[0]).toLowerCase() === '#';
-    const offset = hasNumberCol ? 1 : 0;
-
-    const qText = cellValue(row[offset]);
-    const optA = cellValue(row[offset + 1]);
-    const optB = cellValue(row[offset + 2]);
-    const optC = cellValue(row[offset + 3]);
-    const optD = cellValue(row[offset + 4]);
-    const optE = cellValue(row[offset + 5]);
-    const correctLetter = cellValue(row[offset + 6]).toUpperCase();
-    const explanation = cellValue(row[offset + 7]);
+    const qText = cellValue(row[questionCol]);
+    const correctLetter = cellValue(row[correctAnswerCol]).toUpperCase();
+    const explanation = cellValue(row[explanationCol]);
 
     if (!qText) continue;
 
-    // Build options (only non-empty)
-    const options: string[] = [optA, optB, optC, optD, optE].filter(o => o !== '');
+    // Build options from detected option columns (only non-empty)
+    const options: string[] = optionColIndices
+      .map(colIdx => cellValue(row[colIdx]))
+      .filter(o => o !== '');
 
     const qNum = questions.length + 1;
 
