@@ -320,7 +320,7 @@ export function generateTemplateXLSX(): void {
     ['Subject', 'Physics'],
     ['Chapter', ''],
     ['Class', '10 or 11 or 12'],
-    ['Semester', '1 or 2 (only for Class 11 or 12)'],
+    ['Semester', '1-2 for Class 11, 3-4 for Class 12'],
     ['Description', ''],
     ['Time Limit', 30],
     ['Coin Fee', 0],
