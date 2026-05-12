@@ -15,7 +15,7 @@ export function usePosts(params: { page?: number; type?: string } = {}) {
 export function useCreatePost() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (data: { title: string; description: string }) => {
+    mutationFn: async (data: { description: string }) => {
       const res = await api.post('/posts', data);
       return res.data;
     },

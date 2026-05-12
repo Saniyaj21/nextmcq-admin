@@ -145,8 +145,8 @@ export interface Post {
   type: 'teacher_test_created' | 'student_test_attempt' | 'user_joined' | 'user_post';
   creator: Pick<User, '_id' | 'name' | 'email'> | string | null;
   data: Record<string, unknown>;
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
   createdAt: string;
 }
 
